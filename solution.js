@@ -1,15 +1,14 @@
-
-//map
+// map object
 const myMap = {
-    coordinates: [],
-    map: [],
-    markers: [],
-    businesses: [],
-    
-    // build leaflet map
+	coordinates: [],
+	businesses: [],
+	map: {},
+	markers: {},
+
+	// build leaflet map
 	buildMap() {
-		myMap.map = L.map('map', {
-		center: myMap.coordinates,
+		this.map = L.map('map', {
+		center: this.coordinates,
 		zoom: 11,
 		});
 		// add openstreetmap tiles
@@ -17,33 +16,34 @@ const myMap = {
 		attribution:
 			'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 		minZoom: '15',
-		}).addTo(myMap.map)
+		}).addTo(this.map)
 		// create and add geolocation marker
-		const marker = L.marker(myMap.coordinates)
+		const marker = L.marker(this.coordinates)
 		marker
-		.addTo(myMap.map)
+		.addTo(this.map)
 		.bindPopup('<p1><b>You are here</b><br></p1>')
 		.openPopup()
 	},
-    // add business markers
+
+	// add business markers
 	addMarkers() {
-		for (var i = 0; i < myMap.businesses.length; i++) {
-		    myMap.markers = L.marker([
-			myMap.businesses[i].lat,
-			myMap.businesses[i].long,
+		for (var i = 0; i < this.businesses.length; i++) {
+		this.markers = L.marker([
+			this.businesses[i].lat,
+			this.businesses[i].long,
 		])
-			.bindPopup(`<p1>${myMap.businesses[i].name}</p1>`)
-			.addTo(myMap.map)
+			.bindPopup(`<p1>${this.businesses[i].name}</p1>`)
+			.addTo(this.map)
 		}
 	},
-};
+}
 
-// Get the user's coords:                                                              
+// get coordinates via geolocation api
 async function getCoords(){
-     position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject)
-    })
-    return [position.coords.latitude, position.coords.longitude]
+	const pos = await new Promise((resolve, reject) => {
+		navigator.geolocation.getCurrentPosition(resolve, reject)
+	});
+	return [pos.coords.latitude, pos.coords.longitude]
 }
 
 // get foursquare businesses
@@ -52,13 +52,13 @@ async function getFoursquare(business) {
 		method: 'GET',
 		headers: {
 		Accept: 'application/json',
-		Authorization: 'fsq39S1qyCYQ68E8O6fT6CaOs1PiEWO/YpPXvjsxj+5PAt0='
+		Authorization: 'fsq3ATzZbmcGhdeFafr73wZcnJ+LlN6bK+4dh19a7ClS4u8='
 		}
 	}
 	let limit = 5
 	let lat = myMap.coordinates[0]
-	let long = myMap.coordinates[1]
-	let response = await fetch(`https://api.foursquare.com/v3/places/search?&query=${business}&limit=${limit}&ll=${lat}%2C${long}`, options)
+	let lon = myMap.coordinates[1]
+	let response = await fetch(`https://api.foursquare.com/v3/places/search?&query=${business}&limit=${limit}&ll=${lat}%2C${lon}`, options)
 	let data = await response.text()
 	let parsedData = JSON.parse(data)
 	let businesses = parsedData.results
@@ -77,6 +77,8 @@ function processBusinesses(data) {
 	return businesses
 }
 
+
+// event handlers
 // window load
 window.onload = async () => {
 	const coords = await getCoords()

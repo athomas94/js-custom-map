@@ -1,0 +1,12 @@
+{
+  "name": "js-custom-map",
+  "version": "1.0.0",
+  "description": "This project is creating a custom map that will use geotaging to locate a user, and recommend nearby services to them based on location.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
