@@ -1,0 +1,1 @@
+This project is creating a custom map that will use geotaging to locate a user, and recommend nearby services to them based on location.
